@@ -1,27 +1,40 @@
 {
-  "name": "group-tick",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.2.0-canary.67"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.0-canary.67",
-    "@eslint/eslintrc": "^3"
-  }
+	"name": "group-tick",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev --turbopack",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"db:push": "drizzle-kit push"
+	},
+	"dependencies": {
+		"@clerk/nextjs": "^6.12.0",
+		"@radix-ui/react-dialog": "^1.1.6",
+		"@radix-ui/react-slot": "^1.1.2",
+		"class-variance-authority": "^0.7.1",
+		"clsx": "^2.1.1",
+		"dotenv": "^16.4.7",
+		"drizzle-orm": "^0.39.3",
+		"lucide-react": "^0.475.0",
+		"mysql2": "^3.12.0",
+		"next": "15.2.0-canary.67",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"tailwind-merge": "^3.0.1",
+		"tailwindcss-animate": "^1.0.7"
+	},
+	"devDependencies": {
+		"@eslint/eslintrc": "^3.2.0",
+		"@tailwindcss/postcss": "^4.0.8",
+		"@types/node": "^20.17.19",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
+		"drizzle-kit": "^0.30.4",
+		"eslint": "^9.20.1",
+		"eslint-config-next": "15.2.0-canary.67",
+		"tailwindcss": "^4.0.8",
+		"typescript": "^5.7.3"
+	}
 }
