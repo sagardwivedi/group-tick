@@ -25,7 +25,7 @@ export default async function GroupsList() {
 						<div className="text-center space-y-4 py-8">
 							<div className="text-gray-500 space-y-3">
 								<PlusCircle className="w-12 h-12 mx-auto text-gray-400" />
-								<p className="text-lg">You haven't created any groups yet</p>
+								<p className="text-lg">You haven&apos;t created any groups yet</p>
 								<Button asChild className="mt-4">
 									<Link href="/create-group">Create New Group</Link>
 								</Button>
@@ -68,7 +68,7 @@ export default async function GroupsList() {
 						<div className="text-center space-y-4 py-8">
 							<div className="text-gray-500 space-y-3">
 								<Search className="w-12 h-12 mx-auto text-gray-400" />
-								<p className="text-lg">You haven't joined any groups yet</p>
+								<p className="text-lg">You haven&apos;t joined any groups yet</p>
 								<GroupCreateJoinDialog />
 							</div>
 						</div>
