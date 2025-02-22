@@ -1,42 +1,54 @@
 import {
-  int,
+  bigint,
   singlestoreTableCreator,
   timestamp,
-  varchar
+  varchar,
 } from "drizzle-orm/singlestore-core";
-
 
 export const createTable = singlestoreTableCreator(name => `group_tick_${name}`);
 
-
-export const groups_table = createTable("groups", {
-  group_id: int("group_id").autoincrement().primaryKey(),
-  created_by: varchar("created_by").notNull(),
+export const group_table = createTable("group", {
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
+  created_by: varchar("created_by", { length: 255 }).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
+  join_code: varchar("join_code", { length: 6 })
+    .notNull()
+    .$default(() => Math.random().toString(16).slice(2, 8).toUpperCase()),
 });
 
-
-export const group_members_table = createTable("group_members", {
-  group_member_id: int("group_member_id").autoincrement().primaryKey(),
-  user_id: varchar("user_id").notNull(),
-  group_id: int("group_id").notNull(),
+export const group_member_table = createTable("group_member", {
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
+  user_id: varchar("user_id", { length: 255 }).notNull(),
+  group_id: bigint("group_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
 });
 
-
-export const tasks_table = createTable("tasks", {
-  task_id: int("task_id").autoincrement().primaryKey(),
-  created_by: varchar("created_by").notNull(),
-  group_id: int("group_id").notNull(),
+export const task_table = createTable("task", {
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
+  created_by: varchar("created_by", { length: 255 }).notNull(),
+  group_id: bigint("group_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
   name: varchar("name", { length: 255 }).notNull(),
   description: varchar("description", { length: 500 }),
   due_date: timestamp("due_date"),
   created_at: timestamp("created_at").defaultNow(),
 });
 
+export const subtask_table = createTable("subtask", {
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
+  task_id: bigint("task_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
+  name: varchar("name", { length: 255 }).notNull(),
+  created_at: timestamp("created_at").defaultNow(),
+});
 
 export const task_completion_table = createTable("task_completion", {
-  task_completion_id: int("task_completion_id").autoincrement().primaryKey(),
-  task_id: int("task_id").notNull(),
-  completed_by: varchar("completed_by").notNull(),
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
+  task_id: bigint("task_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
+  completed_by: varchar("completed_by", { length: 255 }).notNull(),
+  completed_at: timestamp("completed_at").defaultNow(),
+});
+
+export const subtask_completion_table = createTable("subtask_completion", {
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
+  subtask_id: bigint("subtask_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
+  completed_by: varchar("completed_by", { length: 255 }).notNull(),
   completed_at: timestamp("completed_at").defaultNow(),
 });
