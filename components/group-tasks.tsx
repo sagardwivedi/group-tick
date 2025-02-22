@@ -63,8 +63,6 @@ export default function GroupTasks({
 	useEffect(() => {
 		if (message?.success) {
 			setOpen(false);
-			setTaskName("");
-			setSubtasks([]);
 		}
 	}, [message]);
 
@@ -73,45 +71,14 @@ export default function GroupTasks({
 			<header className="flex justify-between items-center">
 				<Button
 					variant="ghost"
-					onClick={() => router.back()}
+					onClick={() => router.push("/")}
 					className="flex items-center gap-2"
 				>
 					<ArrowLeft className="h-4 w-4" />
 					Back
 				</Button>
-				<Sheet>
-					<SheetTrigger asChild>
-						<Button variant="outline" className="flex items-center gap-2">
-							<Info className="h-4 w-4" />
-							Group Info
-						</Button>
-					</SheetTrigger>
-					<SheetContent>
-						<SheetHeader>
-							<SheetTitle>{group.name}</SheetTitle>
-						</SheetHeader>
-						<div className="mt-4 space-y-4">
-							<div>
-								<h3 className="text-sm font-medium text-muted-foreground">
-									Created by
-								</h3>
-								<p className="text-sm">{group.created_by}</p>
-							</div>
-							{group.join_code && group.join_code !== "unknown" ? (
-								<div>
-									<h3 className="text-sm font-medium text-muted-foreground">
-										Join Code
-									</h3>
-									<Badge variant="secondary" className="mt-1">
-										{group.join_code as string}
-									</Badge>
-								</div>
-							) : (
-								""
-							)}
-						</div>
-					</SheetContent>
-				</Sheet>
+				<h2 className="text-3xl">{group.name}</h2>
+				<GroupInfo group={group} />
 			</header>
 
 			<Card>
@@ -225,5 +192,43 @@ export default function GroupTasks({
 				</DialogContent>
 			</Dialog>
 		</div>
+	);
+}
+
+function GroupInfo({ group }: { group: GroupType }) {
+	return (
+		<Sheet>
+			<SheetTrigger asChild>
+				<Button variant="outline" className="flex items-center gap-2">
+					<Info className="h-4 w-4" />
+					Group Info
+				</Button>
+			</SheetTrigger>
+			<SheetContent>
+				<SheetHeader>
+					<SheetTitle>{group.name}</SheetTitle>
+				</SheetHeader>
+				<div className="mt-4 space-y-4">
+					<div>
+						<h3 className="text-sm font-medium text-muted-foreground">
+							Created by
+						</h3>
+						<p className="text-sm">{group.created_by}</p>
+					</div>
+					{group.join_code && group.join_code !== "unknown" ? (
+						<div>
+							<h3 className="text-sm font-medium text-muted-foreground">
+								Join Code
+							</h3>
+							<Badge variant="secondary" className="mt-1">
+								{group.join_code as string}
+							</Badge>
+						</div>
+					) : (
+						""
+					)}
+				</div>
+			</SheetContent>
+		</Sheet>
 	);
 }

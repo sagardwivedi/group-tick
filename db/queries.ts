@@ -144,7 +144,7 @@ export const QUERIES = {
             .from(task_table)
             .leftJoin(subtask_table, eq(task_table.id, subtask_table.task_id))
             .where(eq(task_table.group_id, groupId))
-            .orderBy(desc(task_table.due_date));
+            .orderBy(desc(task_table.created_at));
 
         const tasksMap: Record<string, TaskWithSubtask> = {};
 

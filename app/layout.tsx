@@ -42,7 +42,7 @@ const RootLayout = ({
 				<body
 					className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-gray-50`}
 				>
-					<header className="sticky top-0 z-50 bg-white">
+					<header className="sticky top-0 z-50 border-b">
 						<div className="px-8">
 							<div className="h-16 flex justify-between items-center">
 								<h1 className="text-2xl">GroupTick</h1>

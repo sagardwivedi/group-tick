@@ -8,7 +8,7 @@ import {
 export const createTable = singlestoreTableCreator(name => `group_tick_${name}`);
 
 export const group_table = createTable("group", {
-  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),
   created_by: varchar("created_by", { length: 255 }).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   join_code: varchar("join_code", { length: 6 })
@@ -17,15 +17,15 @@ export const group_table = createTable("group", {
 });
 
 export const group_member_table = createTable("group_member", {
-  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),
   user_id: varchar("user_id", { length: 255 }).notNull(),
-  group_id: bigint("group_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
+  group_id: bigint("group_id", { mode: "number" }).notNull(),
 });
 
 export const task_table = createTable("task", {
-  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),
   created_by: varchar("created_by", { length: 255 }).notNull(),
-  group_id: bigint("group_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
+  group_id: bigint("group_id", { mode: "number" }).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   description: varchar("description", { length: 500 }),
   due_date: timestamp("due_date"),
@@ -33,22 +33,22 @@ export const task_table = createTable("task", {
 });
 
 export const subtask_table = createTable("subtask", {
-  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
-  task_id: bigint("task_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),
+  task_id: bigint("task_id", { mode: "number" }).notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   created_at: timestamp("created_at").defaultNow(),
 });
 
 export const task_completion_table = createTable("task_completion", {
-  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
-  task_id: bigint("task_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),
+  task_id: bigint("task_id", { mode: "number" }).notNull(),
   completed_by: varchar("completed_by", { length: 255 }).notNull(),
   completed_at: timestamp("completed_at").defaultNow(),
 });
 
 export const subtask_completion_table = createTable("subtask_completion", {
-  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),  // ⬅️ Use BIGINT
-  subtask_id: bigint("subtask_id", { mode: "number" }).notNull(),  // ⬅️ Use BIGINT
+  id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),
+  subtask_id: bigint("subtask_id", { mode: "number" }).notNull(),
   completed_by: varchar("completed_by", { length: 255 }).notNull(),
   completed_at: timestamp("completed_at").defaultNow(),
 });
