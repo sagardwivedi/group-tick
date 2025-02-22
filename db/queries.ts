@@ -94,13 +94,13 @@ export const QUERIES = {
         const createdGroups = await db
             .select({ id: group_table.id, name: group_table.name })
             .from(group_table)
-            .where(eq(group_table.created_by, user.id));
+            .where(eq(group_table.created_by, user.id)).orderBy(desc(group_table.created_at));
 
         const joinedGroups = await db
             .select({ id: group_table.id, name: group_table.name })
             .from(group_table)
             .innerJoin(group_member_table, eq(group_table.id, group_member_table.group_id))
-            .where(eq(group_member_table.user_id, user.id));
+            .where(eq(group_member_table.user_id, user.id)).orderBy(desc(group_table.created_at));
 
         return { owner: createdGroups, member: joinedGroups };
     },

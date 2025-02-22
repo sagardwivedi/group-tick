@@ -5,7 +5,9 @@ import {
   varchar,
 } from "drizzle-orm/singlestore-core";
 
-export const createTable = singlestoreTableCreator(name => `group_tick_${name}`);
+export const createTable = singlestoreTableCreator(
+  (name) => `group_tick_${name}`
+);
 
 export const group_table = createTable("group", {
   id: bigint("id", { mode: "number" }).autoincrement().primaryKey(),
@@ -14,6 +16,8 @@ export const group_table = createTable("group", {
   join_code: varchar("join_code", { length: 6 })
     .notNull()
     .$default(() => Math.random().toString(16).slice(2, 8).toUpperCase()),
+
+  created_at: timestamp("created_at").defaultNow(),
 });
 
 export const group_member_table = createTable("group_member", {
