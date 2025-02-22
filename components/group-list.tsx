@@ -1,99 +1,97 @@
-import { QUERIES } from "@/db/queries";
-import { Crown, PlusCircle, Search, Users } from "lucide-react";
 import Link from "next/link";
-import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
+import { Crown, PlusCircle, Search, Users } from "lucide-react";
+import { QUERIES } from "@/db/queries";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { GroupCreateJoin } from "./group-create-join";
 
-export default async function GroupsList() {
-  const groupsData = await QUERIES.getAllGroupsByUser();
-  const { owner, member } = groupsData;
+type GroupsListProps = {
+  mobileView?: boolean;
+};
+
+type GroupSectionProps = {
+  title: string;
+  groups: Array<{ id: number; name: string }>;
+  icon: React.ReactNode;
+  emptyIcon: React.ReactNode;
+  emptyText: string;
+  cta?: React.ReactNode;
+  className?: string;
+};
+
+export async function GroupsList({ mobileView }: GroupsListProps) {
+  const { owner: createdGroups, member: joinedGroups } =
+    await QUERIES.getAllGroupsByUser();
+
+  const GroupSection = ({
+    title,
+    groups,
+    icon,
+    emptyIcon,
+    emptyText,
+    cta,
+    className,
+  }: GroupSectionProps) => (
+    <section
+      className={cn("space-y-4 rounded-lg border bg-card p-4", className)}
+    >
+      <header className="flex items-center gap-2">
+        {icon}
+        <h2 className="text-lg font-semibold">{title}</h2>
+      </header>
+
+      {groups.length === 0 ? (
+        <div className="flex flex-col items-center gap-3 py-4 text-center text-muted-foreground">
+          {emptyIcon}
+          <p className="text-sm">{emptyText}</p>
+          {cta}
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {groups.map((group) => (
+            <li key={group.id}>
+              <Button
+                asChild
+                variant="ghost"
+                className="h-auto w-full justify-start px-3 py-2 text-left"
+              >
+                <Link href={`/g/${group.id}`}>
+                  <span className="line-clamp-1">{group.name}</span>
+                </Link>
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
 
   return (
-    <ScrollArea className="h-[79vh]">
-      <div className="space-y-5 max-w-3xl mx-auto">
-        {/* Groups You Created */}
-        <section className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
-          <div className="flex items-center gap-3 mb-6">
-            <Crown className="w-6 h-6 text-indigo-600" />
-            <h2 className="text-xl font-semibold text-indigo-900">
-              Created Groups
-            </h2>
-          </div>
+    <ScrollArea className="h-full">
+      <div className={cn("space-y-6", mobileView ? "p-2" : "p-4")}>
+        <GroupSection
+          title="Created Groups"
+          groups={createdGroups}
+          icon={<Crown className="h-5 w-5 text-amber-600" />}
+          emptyIcon={
+            <>
+              <PlusCircle className="mx-auto h-8 w-8" />
+              <GroupCreateJoin />
+            </>
+          }
+          emptyText="You haven't created any groups yet"
+          className="border-amber-100 bg-amber-50/50"
+        />
 
-          {owner.length === 0 ? (
-            <div className="text-center space-y-4 py-8">
-              <div className="text-gray-500 space-y-3">
-                <PlusCircle className="w-12 h-12 mx-auto text-gray-400" />
-                <p className="text-lg">
-                  You haven&apos;t created any groups yet
-                </p>
-              </div>
-            </div>
-          ) : (
-            <ul className="grid gap-3">
-              {owner.map((group) => (
-                <li key={group.id}>
-                  <Button
-                    asChild
-                    className="w-full justify-start px-3 py-5 bg-white hover:bg-indigo-50 transition-all 
-									         shadow-sm hover:shadow-md group rounded-xl"
-                  >
-                    <Link href={`/g/${group.id}`}>
-                      <span className="mr-3 text-indigo-600 group-hover:text-indigo-700">
-                        <Crown className="w-5 h-5" />
-                      </span>
-                      <span className="text-gray-800 group-hover:text-indigo-900 font-medium">
-                        {group.name}
-                      </span>
-                    </Link>
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        {/* Groups You Joined */}
-        <section className="bg-green-50/50 p-6 rounded-xl border border-green-100">
-          <div className="flex items-center gap-3 mb-6">
-            <Users className="w-6 h-6 text-green-600" />
-            <h2 className="text-xl font-semibold text-green-900">
-              Joined Groups
-            </h2>
-          </div>
-
-          {member.length === 0 ? (
-            <div className="text-center space-y-4 py-8">
-              <div className="text-gray-500 space-y-3">
-                <Search className="w-12 h-12 mx-auto text-gray-400" />
-                <p className="text-lg">
-                  You haven&apos;t joined any groups yet
-                </p>
-              </div>
-            </div>
-          ) : (
-            <ul className="grid gap-3">
-              {member.map((group) => (
-                <li key={group.id}>
-                  <Button
-                    asChild
-                    className="w-full justify-start px-6 py-5 bg-white hover:bg-green-50 transition-all 
-									         shadow-sm hover:shadow-md group rounded-xl"
-                  >
-                    <Link href={`/g/${group.id}`}>
-                      <span className="mr-3 text-green-600 group-hover:text-green-700">
-                        <Users className="w-5 h-5" />
-                      </span>
-                      <span className="text-gray-800 group-hover:text-green-900 font-medium">
-                        {group.name}
-                      </span>
-                    </Link>
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        <GroupSection
+          title="Joined Groups"
+          groups={joinedGroups}
+          icon={<Users className="h-5 w-5 text-emerald-600" />}
+          emptyIcon={<Search className="mx-auto h-8 w-8" />}
+          emptyText="You haven't joined any groups yet"
+          className="border-emerald-100 bg-emerald-50/50"
+        />
       </div>
     </ScrollArea>
   );

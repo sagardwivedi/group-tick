@@ -30,7 +30,8 @@ import {
 } from "@/lib/actions/action";
 import { ArrowLeft, Info, Loader, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { Fragment, useActionState, useEffect, useState } from "react";
+import { Separator } from "./ui/separator";
 
 type GroupType = Awaited<ReturnType<typeof QUERIES.getGroupById>>;
 
@@ -43,34 +44,41 @@ export function GroupTasks({ tasks = [], group }: GroupTasksProps) {
   const router = useRouter();
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <header className="flex justify-between items-center">
-        <Button
-          variant="ghost"
-          onClick={() => router.push("/")}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
-        <h2 className="text-3xl">{group.name}</h2>
+    <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
+      <header className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div className="flex items-center justify-between md:justify-start gap-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 p-2 md:px-4"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="sr-only md:not-sr-only">Back</span>
+          </Button>
+          <h2 className="text-xl md:text-3xl font-semibold truncate max-w-[50vw]">
+            {group.name}
+          </h2>
+        </div>
         <GroupInfo group={group} />
       </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Tasks</CardTitle>
+      <Card className="w-full">
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-xl md:text-2xl">Tasks</CardTitle>
         </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[50vh]">
+        <CardContent className="p-4 md:p-6">
+          <ScrollArea className="h-[60vh] min-h-[300px]">
             {tasks.length > 0 ? (
-              <ul className="space-y-4">
+              <ul className="space-y-2 md:space-y-4">
                 {tasks.map((task) => (
-                  <TaskItem key={task.id} task={task} />
+                  <Fragment key={task.id}>
+                    <TaskItem task={task} />
+                    <Separator className="md:hidden" />
+                  </Fragment>
                 ))}
               </ul>
             ) : (
-              <p className="text-muted-foreground text-center py-4">
+              <p className="text-muted-foreground text-center py-8">
                 No tasks yet.
               </p>
             )}
@@ -95,24 +103,22 @@ function TaskItem({ task }: TaskItemProps) {
   );
 
   return (
-    <li className="space-y-2">
+    <li className="space-y-2 p-2 md:p-0">
       <form action={action} className="flex items-center gap-3">
         <input type="hidden" name="task_id" value={task.id} />
         <CheckboxWithStatus checked={task.completed} pending={isPending} />
         <span
-          className={task.completed ? "line-through text-muted-foreground" : ""}
+          className={`text-sm md:text-base ${
+            task.completed ? "line-through text-muted-foreground" : ""
+          }`}
         >
           {task.name}
         </span>
-        {state?.success ? (
-          <p>{state.success}</p>
-        ) : (
-          state?.error && <p className="text-red-500">{state.error}</p>
-        )}
+        {state?.error && <p className="text-red-500 text-sm">{state.error}</p>}
       </form>
 
       {task.subtasks?.length > 0 && (
-        <ul className="pl-6 space-y-2">
+        <ul className="pl-6 md:pl-8 space-y-1 md:space-y-2">
           {task.subtasks.map((subtask) => (
             <SubtaskItem key={subtask.id} subtask={subtask} />
           ))}
@@ -139,17 +145,13 @@ function SubtaskItem({ subtask }: SubtaskItemProps) {
         <input type="hidden" name="subtask_id" value={subtask.id} />
         <CheckboxWithStatus checked={subtask.completed} pending={isPending} />
         <span
-          className={
+          className={`text-xs md:text-sm ${
             subtask.completed ? "line-through text-muted-foreground" : ""
-          }
+          }`}
         >
           {subtask.name}
         </span>
-        {state?.success ? (
-          <p>{state.success}</p>
-        ) : (
-          state?.error && <p className="text-red-500">{state.error}</p>
-        )}
+        {state?.error && <p className="text-red-500 text-sm">{state.error}</p>}
       </form>
     </li>
   );
@@ -166,7 +168,11 @@ function CheckboxWithStatus({ checked, pending }: CheckboxWithStatusProps) {
       {pending ? (
         <Loader className="h-4 w-4 animate-spin" />
       ) : (
-        <Checkbox type="submit" className="cursor-pointer" checked={checked} />
+        <Checkbox
+          type="submit"
+          className="cursor-pointer h-4 w-4 md:h-5 md:w-5"
+          checked={checked}
+        />
       )}
     </>
   );
@@ -180,30 +186,30 @@ function GroupInfo({ group }: GroupInfoProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Info className="h-5 w-5" />
-          <span className="font-medium">Group Info</span>
+        <Button variant="outline" className="gap-2 w-full md:w-auto">
+          <Info className="h-4 w-4" />
+          <span className="text-sm md:text-base">Group Info</span>
         </Button>
       </SheetTrigger>
 
-      <SheetContent>
-        <SheetHeader className="mb-6">
-          <SheetTitle className="text-lg font-semibold">
+      <SheetContent className="w-full sm:max-w-md">
+        <SheetHeader className="mb-4 md:mb-6">
+          <SheetTitle className="text-lg md:text-xl font-semibold">
             {group.name}
           </SheetTitle>
         </SheetHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           <div className="space-y-1">
-            <h3 className="text-sm font-medium text-muted-foreground">
+            <h3 className="text-xs md:text-sm font-medium text-muted-foreground">
               Created by
             </h3>
-            <p className="text-sm">{group.created_by}</p>
+            <p className="text-sm md:text-base">{group.created_by}</p>
           </div>
 
           {group.join_code !== "unknown" && (
             <div className="space-y-1">
-              <h3 className="text-sm font-medium text-muted-foreground">
+              <h3 className="text-xs md:text-sm font-medium text-muted-foreground">
                 Join Code
               </h3>
               <Badge variant="secondary" className="text-sm py-1 px-3">
@@ -236,13 +242,16 @@ function AddTaskDialog({ groupId }: AddTaskDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full">
-          <Plus className="mr-2 h-4 w-4" /> Add Task
+        <Button className="w-full md:w-auto">
+          <Plus className="mr-2 h-4 w-4" />
+          <span className="text-sm md:text-base">Add Task</span>
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-[95%] sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create New Task</DialogTitle>
+          <DialogTitle className="text-lg md:text-xl">
+            Create New Task
+          </DialogTitle>
         </DialogHeader>
 
         <form action={formAction} className="space-y-4">
@@ -253,16 +262,18 @@ function AddTaskDialog({ groupId }: AddTaskDialogProps) {
             placeholder="Task name"
             required
             aria-label="Task name"
+            className="text-sm md:text-base"
           />
 
           <div className="space-y-2">
-            <h3 className="text-sm font-medium">Subtasks</h3>
+            <h3 className="text-sm md:text-base font-medium">Subtasks</h3>
             {subtasks.map((_, index) => (
               <div key={index} className="flex items-center gap-2">
                 <Input
                   name={`subtasks[${index}]`}
                   placeholder={`Subtask ${index + 1}`}
                   aria-label={`Subtask ${index + 1}`}
+                  className="text-sm md:text-base"
                 />
                 <Button
                   type="button"
@@ -271,6 +282,7 @@ function AddTaskDialog({ groupId }: AddTaskDialogProps) {
                   onClick={() =>
                     setSubtasks((prev) => prev.filter((_, i) => i !== index))
                   }
+                  className="h-8 w-8"
                 >
                   <Trash className="h-4 w-4 text-destructive" />
                 </Button>
@@ -281,7 +293,7 @@ function AddTaskDialog({ groupId }: AddTaskDialogProps) {
               variant="outline"
               size="sm"
               onClick={() => setSubtasks((prev) => [...prev, { name: "" }])}
-              className="w-full"
+              className="w-full text-sm md:text-base"
             >
               <Plus className="mr-2 h-4 w-4" /> Add Subtask
             </Button>
@@ -300,7 +312,11 @@ function AddTaskDialog({ groupId }: AddTaskDialogProps) {
 
 function SubmitButton({ pending }: { pending: boolean }) {
   return (
-    <Button type="submit" disabled={pending} className="w-full">
+    <Button
+      type="submit"
+      disabled={pending}
+      className="w-full text-sm md:text-base"
+    >
       {pending ? <Loader className="h-4 w-4 animate-spin" /> : "Create Task"}
     </Button>
   );

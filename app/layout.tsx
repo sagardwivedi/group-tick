@@ -9,11 +9,13 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 
-import GroupsList from "@/components/group-list";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import "./globals.css";
+import { LandingPageContent } from "@/components/landing-page";
+import { GroupsList } from "@/components/group-list";
+import { MobileGroupsDrawer } from "@/components/mobile-groups";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,10 +43,15 @@ const RootLayout = ({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-gray-50`}
         >
-          <header className="sticky bg-white top-0 z-50 border-b">
-            <div className="px-8">
+          <header className="sticky bg-white inset-x-0 top-0 z-50 border-b">
+            <div className="md:px-8 px-4">
               <div className="h-16 flex justify-between items-center">
-                <h1 className="text-2xl">GroupTick</h1>
+                <div className="flex items-center gap-2">
+                  <SignedIn>
+                    <MobileGroupsDrawer />
+                  </SignedIn>
+                  <h1 className="md:text-2xl text-xl">GroupTick</h1>
+                </div>
                 <div>
                   <SignedOut>
                     <SignInButton mode="modal">
@@ -56,7 +63,12 @@ const RootLayout = ({
                   <SignedIn>
                     <UserButton
                       showName
-                      appearance={{ elements: { avatarBox: "w-8 h-8" } }}
+                      appearance={{
+                        elements: {
+                          avatarBox: "w-8 h-8",
+                          userButtonBox: "flex items-center gap-2",
+                        },
+                      }}
                       fallback={<Skeleton className="w-8 h-8 rounded-full" />}
                     />
                   </SignedIn>
@@ -64,10 +76,13 @@ const RootLayout = ({
               </div>
             </div>
           </header>
+          <SignedOut>
+            <LandingPageContent />
+          </SignedOut>
 
           <div className="flex flex-1">
             <SignedIn>
-              <aside className="w-64 border-r bg-white fixed h-full">
+              <aside className="w-64 max-md:hidden border-r bg-white fixed h-full">
                 <div className="h-full">
                   <div className="p-2">
                     <Suspense fallback={<GroupsSkeleton />}>
@@ -78,7 +93,7 @@ const RootLayout = ({
               </aside>
             </SignedIn>
 
-            <main className="flex-1 ml-64">
+            <main className="flex-1 md:ml-64">
               <SignedIn>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                   {children}
