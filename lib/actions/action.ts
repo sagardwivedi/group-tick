@@ -15,7 +15,7 @@ async function handleMutation<T>(
 ): Promise<FormError> {
   try {
     await mutation();
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (error) {
     return {
@@ -96,6 +96,23 @@ export async function updateTaskStatus(
   );
 }
 
+export async function unmarkTaskStatus(
+  _: FormError,
+  queryData: FormData
+): Promise<FormError> {
+  const taskIdStr = queryData.get("task_id")?.toString()?.trim();
+  const taskId = taskIdStr ? Number.parseInt(taskIdStr, 10) : NaN;
+
+  if (isNaN(taskId)) {
+    return { error: "Invalid task ID." };
+  }
+
+  return handleMutation(
+    () => MUTATIONS.unmarkTaskComplete(taskId),
+    "Marking task as complete"
+  );
+}
+
 // 🔹 Update Subtask Status
 export async function updateSubtaskStatus(
   _: FormError,
@@ -110,6 +127,20 @@ export async function updateSubtaskStatus(
 
   return handleMutation(
     () => MUTATIONS.markSubtaskComplete(subtaskId),
+    "Marking subtask as complete"
+  );
+}
+
+export async function unmarkSubtaskStatus(_: FormError, queryData: FormData) {
+  const subtaskIdStr = queryData.get("subtask_id")?.toString()?.trim();
+  const subtaskId = subtaskIdStr ? Number.parseInt(subtaskIdStr, 10) : NaN;
+
+  if (isNaN(subtaskId)) {
+    return { error: "Invalid subtask ID." };
+  }
+
+  return handleMutation(
+    () => MUTATIONS.unmarkSubtaskComplete(subtaskId),
     "Marking subtask as complete"
   );
 }

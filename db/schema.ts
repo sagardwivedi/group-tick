@@ -16,7 +16,6 @@ export const group_table = createTable("group", {
   join_code: varchar("join_code", { length: 6 })
     .notNull()
     .$default(() => Math.random().toString(16).slice(2, 8).toUpperCase()),
-
   created_at: timestamp("created_at").defaultNow(),
 });
 

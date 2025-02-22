@@ -7,14 +7,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
@@ -22,9 +20,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import type { QUERIES, TaskWithSubtask } from "@/db/queries";
+import type { QUERIES, Subtask, TaskWithSubtask } from "@/db/queries";
 import {
   createTask,
+  unmarkSubtaskStatus,
+  unmarkTaskStatus,
   updateSubtaskStatus,
   updateTaskStatus,
 } from "@/lib/actions/action";
@@ -34,48 +34,13 @@ import { useActionState, useEffect, useState } from "react";
 
 type GroupType = Awaited<ReturnType<typeof QUERIES.getGroupById>>;
 
-export default function GroupTasks({
-  tasks,
-  group,
-}: {
-  tasks: TaskWithSubtask[];
+interface GroupTasksProps {
+  tasks?: TaskWithSubtask[];
   group: GroupType;
-}) {
-  const [message, createAction, isPending] = useActionState(createTask, {});
-  const [taskmessage, updateTaskAction, isTaskUpdating] = useActionState(
-    updateTaskStatus,
-    {}
-  );
-  const [subtaskmessage, updateSubtaskAction, isSubtaskUpdating] =
-    useActionState(updateSubtaskStatus, {});
+}
 
+export function GroupTasks({ tasks = [], group }: GroupTasksProps) {
   const router = useRouter();
-
-  const [taskName, setTaskName] = useState("");
-  const [open, setOpen] = useState(false);
-  const [subtasks, setSubtasks] = useState<{ name: string }[]>([]);
-
-  const handleSubtaskChange = (index: number, value: string) => {
-    setSubtasks((prev) =>
-      prev.map((subtask, i) =>
-        i === index ? { ...subtask, name: value } : subtask
-      )
-    );
-  };
-
-  const addSubtaskField = () => {
-    setSubtasks([...subtasks, { name: "" }]);
-  };
-
-  const removeSubtask = (index: number) => {
-    setSubtasks(subtasks.filter((_, i) => i !== index));
-  };
-
-  useEffect(() => {
-    if (message?.success) {
-      setOpen(false);
-    }
-  }, [message]);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -101,74 +66,7 @@ export default function GroupTasks({
             {tasks.length > 0 ? (
               <ul className="space-y-4">
                 {tasks.map((task) => (
-                  <li key={task.id}>
-                    <div className="flex items-center space-x-3">
-                      <form action={updateTaskAction} className="flex gap-x-2">
-                        {isTaskUpdating && <Loader className="animate-spin" />}
-                        <input
-                          type="hidden"
-                          name="task_id"
-                          defaultValue={task.id}
-                        />
-                        <Checkbox type="submit" checked={task.completed} />
-                        {taskmessage.error && <p>{taskmessage.error}</p>}
-                        {taskmessage.success && <p>{taskmessage.success}</p>}
-                      </form>
-                      <span
-                        className={`transition ${
-                          task.completed
-                            ? "line-through text-muted-foreground"
-                            : ""
-                        }`}
-                      >
-                        {task.name}
-                      </span>
-                    </div>
-                    {task.subtasks.length > 0 && (
-                      <ul className="pl-6 mt-2 space-y-1">
-                        {task.subtasks.map((subtask) => (
-                          <li
-                            key={subtask.id}
-                            className="flex items-center space-x-3"
-                          >
-                            <form
-                              action={updateSubtaskAction}
-                              className="flex gap-x-2"
-                            >
-                              {isSubtaskUpdating && (
-                                <Loader className="animate-spin" />
-                              )}
-                              <input
-                                type="hidden"
-                                name="subtask_id"
-                                defaultValue={subtask.id}
-                              />
-                              <Checkbox
-                                type="submit"
-                                checked={subtask.completed}
-                              />
-                              {subtaskmessage.error && (
-                                <p>{subtaskmessage.error}</p>
-                              )}
-                              {subtaskmessage.success && (
-                                <p>{subtaskmessage.success}</p>
-                              )}
-                            </form>
-                            <span
-                              className={`text-sm transition ${
-                                subtask.completed
-                                  ? "line-through text-muted-foreground"
-                                  : ""
-                              }`}
-                            >
-                              {subtask.name}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <Separator className="my-2" />
-                  </li>
+                  <TaskItem key={task.id} task={task} />
                 ))}
               </ul>
             ) : (
@@ -180,104 +78,230 @@ export default function GroupTasks({
         </CardContent>
       </Card>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button className="w-full">
-            <Plus className="mr-2 h-4 w-4" /> Add Task
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create a New Task</DialogTitle>
-            <DialogDescription>
-              Add a task along with optional subtasks.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form action={createAction} className="space-y-4">
-            <input type="hidden" name="group_id" value={group.id} />
-            <Input
-              name="task"
-              placeholder="Task name..."
-              required
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
-              disabled={isPending}
-            />
-
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">Subtasks</h3>
-              {subtasks.map((subtask, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <Input
-                    placeholder={`Subtask ${index + 1}`}
-                    value={subtask.name}
-                    onChange={(e) => handleSubtaskChange(index, e.target.value)}
-                    name={`subtask_${index}`}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeSubtask(index)}
-                    className="text-destructive hover:text-destructive/90"
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                onClick={addSubtaskField}
-                className="w-full"
-              >
-                <Plus className="mr-2 h-4 w-4" /> Add Subtask
-              </Button>
-            </div>
-
-            <Button type="submit" disabled={isPending} className="w-full">
-              {isPending ? "Adding..." : "Add Task"}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <AddTaskDialog groupId={group.id} />
     </div>
   );
 }
 
-function GroupInfo({ group }: { group: GroupType }) {
+interface TaskItemProps {
+  task: TaskWithSubtask;
+}
+
+function TaskItem({ task }: TaskItemProps) {
+  const [state, action, isPending] = useActionState(
+    task.completed ? unmarkTaskStatus : updateTaskStatus,
+    {},
+    task.id
+  );
+
+  return (
+    <li className="space-y-2">
+      <form action={action} className="flex items-center gap-3">
+        <input type="hidden" name="task_id" value={task.id} />
+        <CheckboxWithStatus checked={task.completed} pending={isPending} />
+        <span
+          className={task.completed ? "line-through text-muted-foreground" : ""}
+        >
+          {task.name}
+        </span>
+        {state?.success ? (
+          <p>{state.success}</p>
+        ) : (
+          state?.error && <p className="text-red-500">{state.error}</p>
+        )}
+      </form>
+
+      {task.subtasks?.length > 0 && (
+        <ul className="pl-6 space-y-2">
+          {task.subtasks.map((subtask) => (
+            <SubtaskItem key={subtask.id} subtask={subtask} />
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
+
+interface SubtaskItemProps {
+  subtask: Subtask;
+}
+
+function SubtaskItem({ subtask }: SubtaskItemProps) {
+  const [state, action, isPending] = useActionState(
+    subtask.completed ? unmarkSubtaskStatus : updateSubtaskStatus,
+    {},
+    subtask.id
+  );
+
+  return (
+    <li>
+      <form action={action} className="flex items-center gap-3">
+        <input type="hidden" name="subtask_id" value={subtask.id} />
+        <CheckboxWithStatus checked={subtask.completed} pending={isPending} />
+        <span
+          className={
+            subtask.completed ? "line-through text-muted-foreground" : ""
+          }
+        >
+          {subtask.name}
+        </span>
+        {state?.success ? (
+          <p>{state.success}</p>
+        ) : (
+          state?.error && <p className="text-red-500">{state.error}</p>
+        )}
+      </form>
+    </li>
+  );
+}
+
+interface CheckboxWithStatusProps {
+  checked: boolean;
+  pending: boolean;
+}
+
+function CheckboxWithStatus({ checked, pending }: CheckboxWithStatusProps) {
+  return (
+    <>
+      {pending ? (
+        <Loader className="h-4 w-4 animate-spin" />
+      ) : (
+        <Checkbox type="submit" className="cursor-pointer" checked={checked} />
+      )}
+    </>
+  );
+}
+
+interface GroupInfoProps {
+  group: GroupType;
+}
+
+function GroupInfo({ group }: GroupInfoProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
-          <Info className="h-4 w-4" />
-          Group Info
+        <Button variant="outline" className="gap-2">
+          <Info className="h-5 w-5" />
+          <span className="font-medium">Group Info</span>
         </Button>
       </SheetTrigger>
+
       <SheetContent>
-        <SheetHeader>
-          <SheetTitle>{group.name}</SheetTitle>
+        <SheetHeader className="mb-6">
+          <SheetTitle className="text-lg font-semibold">
+            {group.name}
+          </SheetTitle>
         </SheetHeader>
-        <div className="mt-4 space-y-4">
-          <div>
+
+        <div className="space-y-6">
+          <div className="space-y-1">
             <h3 className="text-sm font-medium text-muted-foreground">
               Created by
             </h3>
             <p className="text-sm">{group.created_by}</p>
           </div>
-          {group.join_code && group.join_code !== "unknown" ? (
-            <div>
+
+          {group.join_code !== "unknown" && (
+            <div className="space-y-1">
               <h3 className="text-sm font-medium text-muted-foreground">
                 Join Code
               </h3>
-              <Badge variant="secondary" className="mt-1">
+              <Badge variant="secondary" className="text-sm py-1 px-3">
                 {group.join_code as string}
               </Badge>
             </div>
-          ) : null}
+          )}
         </div>
       </SheetContent>
     </Sheet>
+  );
+}
+
+interface AddTaskDialogProps {
+  groupId: number;
+}
+
+function AddTaskDialog({ groupId }: AddTaskDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [state, formAction, isPending] = useActionState(createTask, {});
+  const [subtasks, setSubtasks] = useState<{ name: string }[]>([]);
+
+  useEffect(() => {
+    if (state?.success) {
+      setOpen(false);
+      setSubtasks([]);
+    }
+  }, [state]);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="w-full">
+          <Plus className="mr-2 h-4 w-4" /> Add Task
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create New Task</DialogTitle>
+        </DialogHeader>
+
+        <form action={formAction} className="space-y-4">
+          <input type="hidden" name="group_id" value={groupId} />
+
+          <Input
+            name="task"
+            placeholder="Task name"
+            required
+            aria-label="Task name"
+          />
+
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Subtasks</h3>
+            {subtasks.map((_, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  name={`subtasks[${index}]`}
+                  placeholder={`Subtask ${index + 1}`}
+                  aria-label={`Subtask ${index + 1}`}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() =>
+                    setSubtasks((prev) => prev.filter((_, i) => i !== index))
+                  }
+                >
+                  <Trash className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setSubtasks((prev) => [...prev, { name: "" }])}
+              className="w-full"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Add Subtask
+            </Button>
+          </div>
+
+          <SubmitButton pending={isPending} />
+        </form>
+
+        {state?.error && (
+          <p className="text-sm text-destructive text-center">{state.error}</p>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function SubmitButton({ pending }: { pending: boolean }) {
+  return (
+    <Button type="submit" disabled={pending} className="w-full">
+      {pending ? <Loader className="h-4 w-4 animate-spin" /> : "Create Task"}
+    </Button>
   );
 }
