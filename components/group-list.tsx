@@ -12,7 +12,7 @@ export default async function GroupsList() {
 			<div>
 				<h2 className="text-lg font-semibold mb-3">Groups You Created</h2>
 				{owner.length === 0 ? (
-					<p className="text-gray-500">You haven't created any groups yet.</p>
+					<p className="text-gray-500">You haven&apos;t created any groups yet.</p>
 				) : (
 					<ul className="space-y-3">
 						{owner.map((group) => (
@@ -30,7 +30,7 @@ export default async function GroupsList() {
 			<div>
 				<h2 className="text-lg font-semibold mb-3">Groups You Joined</h2>
 				{member.length === 0 ? (
-					<p className="text-gray-500">You haven't joined any groups yet.</p>
+					<p className="text-gray-500">You haven&apos;t joined any groups yet.</p>
 				) : (
 					<ul className="space-y-3">
 						{member.map((group) => (
