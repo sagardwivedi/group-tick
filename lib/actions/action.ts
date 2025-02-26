@@ -6,7 +6,7 @@ import { MUTATIONS } from "@/db/queries";
 
 interface FormError {
   error?: string;
-  success?: boolean;
+  success?: string | boolean;
 }
 
 async function handleMutation<T>(
@@ -15,7 +15,7 @@ async function handleMutation<T>(
 ): Promise<FormError> {
   try {
     await mutation();
-    revalidatePath("/", "layout");
+    revalidatePath("/");
     return { success: true };
   } catch (error) {
     return {
@@ -26,44 +26,65 @@ async function handleMutation<T>(
 }
 
 // 🔹 Create Group
-export async function createGroup(
+export async function createGroupAction(
   _: FormError,
   queryData: FormData
 ): Promise<FormError> {
   const groupName = queryData.get("group_name")?.toString()?.trim();
+  const creatorName = queryData.get("creator_name")?.toString()?.trim();
   if (!groupName) return { error: "Group name is required." };
+  if (!creatorName) return { error: "Creator name is required." };
 
-  return handleMutation(
-    () => MUTATIONS.createGroup(groupName),
-    "Group creation"
-  );
+  try {
+    const { code } = await MUTATIONS.createGroup(groupName, creatorName);
+    revalidatePath("/");
+    return { success: code };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : `Group creation failed.`,
+    };
+  }
 }
 
 // 🔹 Join Group
-export async function joinGroup(
+export async function joinGroupAction(
   _: FormError,
   queryData: FormData
 ): Promise<FormError> {
   const joinCode = queryData.get("code")?.toString()?.trim();
+  const creatorName = queryData.get("joiner_name")?.toString()?.trim();
   if (!joinCode) return { error: "Group code is required." };
+  if (!creatorName) return { error: "Creator name is required." };
 
-  return handleMutation(
-    () => MUTATIONS.joinGroupByCode(joinCode),
-    "Joining group"
-  );
+  try {
+    await MUTATIONS.joinGroup(joinCode, creatorName);
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : `Joining group failed.`,
+    };
+  }
 }
 
-// 🔹 Create Task
 export async function createTask(
   _: FormError,
   queryData: FormData
 ): Promise<FormError> {
   const task = queryData.get("task")?.toString()?.trim();
   const groupIdStr = queryData.get("group_id")?.toString();
-  const groupId = groupIdStr ? Number.parseInt(groupIdStr, 10) : NaN;
+  const dueDateStr = queryData.get("due_date")?.toString();
 
   if (!task) return { error: "Task is required." };
-  if (Number.isNaN(groupId)) return { error: "Invalid or missing Group ID." };
+  if (!groupIdStr) return { error: "Invalid or missing Group ID." };
+
+  let dueDate = null;
+  if (dueDateStr) {
+    dueDate = new Date(dueDateStr);
+    if (isNaN(dueDate.getTime())) {
+      return { error: "Invalid date format." }; // Handle invalid date format
+    }
+  }
 
   const subtasks: string[] = [];
   for (const [key, value] of queryData.entries()) {
@@ -72,10 +93,15 @@ export async function createTask(
     }
   }
 
-  return handleMutation(
-    () => MUTATIONS.createTask(groupId, task, subtasks),
-    "Task creation"
-  );
+  try {
+    await MUTATIONS.createTask(groupIdStr, task, subtasks, dueDate);
+    revalidatePath("/g/[groupId]/page");
+    return { success: true };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : `Creating task failed.`,
+    };
+  }
 }
 
 // 🔹 Update Task Status

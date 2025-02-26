@@ -1,98 +1,103 @@
 import Link from "next/link";
-import { Crown, PlusCircle, Search, Users } from "lucide-react";
-import { QUERIES } from "@/db/queries";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
-import { GroupCreateJoin } from "./group-create-join";
+import { Suspense } from "react";
 
-type GroupsListProps = {
-  mobileView?: boolean;
-};
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
+import { QUERIES } from "@/db/queries";
 
 type GroupSectionProps = {
   title: string;
-  groups: Array<{ id: number; name: string }>;
-  icon: React.ReactNode;
-  emptyIcon: React.ReactNode;
-  emptyText: string;
-  cta?: React.ReactNode;
-  className?: string;
+  children: React.ReactNode;
 };
 
-export async function GroupsList({ mobileView }: GroupsListProps) {
-  const { owner: createdGroups, member: joinedGroups } =
-    await QUERIES.getAllGroupsByUser();
+const GroupSection = ({ title, children }: GroupSectionProps) => (
+  <Card className="h-77 shadow-none">
+    <CardHeader>
+      <CardTitle>{title}</CardTitle>
+    </CardHeader>
+    <CardContent className="px-1">{children}</CardContent>
+  </Card>
+);
 
-  const GroupSection = ({
-    title,
-    groups,
-    icon,
-    emptyIcon,
-    emptyText,
-    cta,
-    className,
-  }: GroupSectionProps) => (
-    <section
-      className={cn("space-y-4 rounded-lg border bg-card p-4", className)}
-    >
-      <header className="flex items-center gap-2">
-        {icon}
-        <h2 className="text-lg font-semibold">{title}</h2>
-      </header>
+type GroupContentProps = {
+  promise: Promise<
+    {
+      id: string;
+      name: string;
+    }[]
+  >;
+  emptyMessage: string;
+};
 
-      {groups.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-4 text-center text-muted-foreground">
-          {emptyIcon}
-          <p className="text-sm">{emptyText}</p>
-          {cta}
-        </div>
-      ) : (
-        <ul className="space-y-2">
-          {groups.map((group) => (
-            <li key={group.id}>
-              <Button
-                asChild
-                variant="ghost"
-                className="h-auto w-full justify-start px-3 py-2 text-left"
-              >
-                <Link href={`/g/${group.id}`}>
-                  <span className="line-clamp-1">{group.name}</span>
-                </Link>
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
+const GroupContent = async ({ promise, emptyMessage }: GroupContentProps) => {
+  const groups = await promise;
+
+  if (groups.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-4 text-center text-muted-foreground">
+        <p className="text-sm">{emptyMessage}</p>
+      </div>
+    );
+  }
 
   return (
-    <ScrollArea className="h-full">
-      <div className={cn("space-y-6", mobileView ? "p-2" : "p-4")}>
-        <GroupSection
-          title="Created Groups"
-          groups={createdGroups}
-          icon={<Crown className="h-5 w-5 text-amber-600" />}
-          emptyIcon={
-            <>
-              <PlusCircle className="mx-auto h-8 w-8" />
-              <GroupCreateJoin />
-            </>
-          }
-          emptyText="You haven't created any groups yet"
-          className="border-amber-100 bg-amber-50/50"
-        />
+    <ul className="space-y-2">
+      {groups.map((group) => (
+        <li key={group.id}>
+          <Button
+            asChild
+            variant="ghost"
+            size={"lg"}
+            className="w-full justify-start"
+          >
+            <Link href={`/g/${group.id}`}>
+              <span className="line-clamp-1">{group.name}</span>
+            </Link>
+          </Button>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
-        <GroupSection
-          title="Joined Groups"
-          groups={joinedGroups}
-          icon={<Users className="h-5 w-5 text-emerald-600" />}
-          emptyIcon={<Search className="mx-auto h-8 w-8" />}
-          emptyText="You haven't joined any groups yet"
-          className="border-emerald-100 bg-emerald-50/50"
-        />
-      </div>
-    </ScrollArea>
+const LoadingSkeleton = () => (
+  <div className="space-y-2">
+    {Array.from({ length: 3 }).map((_, i) => (
+      <Skeleton key={i} className="h-10 w-full" />
+    ))}
+  </div>
+);
+
+export async function GroupsList() {
+  // Start both promises in parallel
+  const createdGroupsPromise = QUERIES.getCreatedGroup();
+  const joinedGroupsPromise = QUERIES.getJoinedGroup();
+
+  return (
+    <div className="space-y-3 p-1">
+      <GroupSection title="Created Groups">
+        <Suspense fallback={<LoadingSkeleton />}>
+          <ScrollArea className="h-60">
+            <GroupContent
+              promise={createdGroupsPromise}
+              emptyMessage="You haven't created any groups yet."
+            />
+          </ScrollArea>
+        </Suspense>
+      </GroupSection>
+
+      <GroupSection title="Joined Groups">
+        <Suspense fallback={<LoadingSkeleton />}>
+          <ScrollArea className="h-60">
+            <GroupContent
+              promise={joinedGroupsPromise}
+              emptyMessage="You haven't joined any groups yet."
+            />
+          </ScrollArea>
+        </Suspense>
+      </GroupSection>
+    </div>
   );
 }

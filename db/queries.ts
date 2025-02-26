@@ -1,358 +1,200 @@
 "use server-only";
 
 import { currentUser } from "@clerk/nextjs/server";
-import { and, desc, eq, exists, sql } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 import { db } from ".";
-import {
-  group_member_table,
-  group_table,
-  subtask_completion_table,
-  subtask_table,
-  task_completion_table,
-  task_table,
-} from "./schema";
+import { group, group_member, subtask, task } from "./schema";
 
-export interface Subtask {
-  id: string;
-  name: string;
-  completed: boolean;
-  task_id: number;
-}
-
-export interface TaskWithSubtask {
-  id: string;
-  name: string;
-  description?: string;
-  created_by: string;
-  completed: boolean;
-  due_date?: Date | null;
-  subtasks: Subtask[];
-}
-
-/**
- * Ensures the current user is authenticated.
- * @throws {Error} If the user is not authenticated.
- */
 async function getAuthenticatedUser() {
   const user = await currentUser();
   if (!user) throw new Error("User not authenticated");
   return user;
 }
 
-/**
- * Checks if a user is a member or owner of a group.
- * @param groupId The group ID.
- * @param userId The user ID.
- * @returns {boolean} Whether the user is a member or owner.
- */
-async function isUserInGroup(
-  groupId: number,
-  userId: string
-): Promise<boolean> {
-  const result = await db
-    .select({
-      isOwner: exists(
-        db
-          .select()
-          .from(group_table)
-          .where(
-            and(eq(group_table.id, groupId), eq(group_table.created_by, userId))
-          )
-      ).as("isOwner"),
-
-      isMember: exists(
-        db
-          .select()
-          .from(group_member_table)
-          .where(
-            and(
-              eq(group_member_table.group_id, groupId),
-              eq(group_member_table.user_id, userId)
-            )
-          )
-      ).as("isMember"),
-    })
-    .from(group_table) // Ensures the query executes
-    .limit(1); // Only fetch one row
-
-  return Boolean(result[0]?.isOwner) || Boolean(result[0]?.isMember);
-}
-
 export const QUERIES = {
-  /**
-   * Retrieves a group by its ID.
-   * @param groupId The group ID.
-   * @returns The group details.
-   */
-  getGroupById: async (groupId: number) => {
-    const user = await getAuthenticatedUser();
+  getCreatedGroup: async () => {
+    const { id: userId } = await getAuthenticatedUser();
     return await db
       .select({
-        id: group_table.id,
-        name: group_table.name,
-        created_by: group_table.created_by,
-        join_code:
-          sql`IF(${group_table.created_by} = ${user.fullName}, ${group_table.join_code}, NULL)`.as(
-            "join_code"
-          ),
+        id: group.id,
+        name: group.group_name,
       })
-      .from(group_table)
-      .where(eq(group_table.id, groupId))
-      .then((rows) => rows[0]);
+      .from(group)
+      .where(eq(group.creator_id, userId))
+      .orderBy(desc(group.created_at));
   },
 
-  /**
-   * Fetches all groups where the user is an owner or a member.
-   */
-  getAllGroupsByUser: async () => {
-    const user = await getAuthenticatedUser();
-
-    // Fetch created groups, ordered by created_at (desc)
-    const createdGroups = await db
-      .select({ id: group_table.id, name: group_table.name })
-      .from(group_table)
-      .where(eq(group_table.created_by, user.fullName || ""))
-      .orderBy(desc(group_table.created_at));
-
-    // Fetch joined groups, ordered by created_at (desc)
-    const joinedGroups = await db
-      .select({ id: group_table.id, name: group_table.name })
-      .from(group_table)
-      .innerJoin(
-        group_member_table,
-        eq(group_table.id, group_member_table.group_id)
-      )
-      .where(eq(group_member_table.user_id, user.fullName || ""))
-      .orderBy(desc(group_table.created_at));
-
-    // Return both lists separately to keep the order intact
-    return { owner: createdGroups, member: joinedGroups };
-  },
-
-  /**
-   * Retrieves tasks and their subtasks for a specific group.
-   */
-  getTasksAndSubtasksByGroupId: async (groupId: number) => {
-    const user = await getAuthenticatedUser();
-
-    const rows = await db
+  getJoinedGroup: async () => {
+    const { id: userId } = await getAuthenticatedUser();
+    return await db
       .select({
-        taskId: task_table.id,
-        taskName: task_table.name,
-        taskDescription: task_table.description,
-        taskCreatedBy: task_table.created_by,
-        taskDueDate: task_table.due_date,
-        taskCompleted: exists(
-          db
-            .select()
-            .from(task_completion_table)
-            .where(
-              and(
-                eq(task_completion_table.task_id, task_table.id),
-                eq(task_completion_table.completed_by, user?.fullName || "")
-              )
-            )
-        ).as("taskCompleted"),
-        subtaskId: subtask_table.id,
-        subtaskName: subtask_table.name,
-        subtaskCompleted: exists(
-          db
-            .select()
-            .from(subtask_completion_table)
-            .where(
-              and(
-                eq(subtask_completion_table.subtask_id, subtask_table.id),
-                eq(subtask_completion_table.completed_by, user?.fullName || "")
-              )
-            )
-        ).as("subtaskCompleted"),
+        id: group.id,
+        name: group.group_name,
       })
-      .from(task_table)
-      .leftJoin(subtask_table, eq(task_table.id, subtask_table.task_id))
-      .where(eq(task_table.group_id, groupId))
-      .orderBy(desc(task_table.created_at));
+      .from(group)
+      .innerJoin(group_member, eq(group.id, group_member.group_id))
+      .where(eq(group_member.user_id, userId))
+      .orderBy(desc(group.created_at));
+  },
 
-    const tasksMap: Record<string, TaskWithSubtask> = {};
+  getGroupInfo: async (groupId: string) => {
+    return db.query.group.findFirst({
+      where: eq(group.id, groupId),
+      columns: {
+        id: true,
+        group_name: true,
+        join_code: true,
+        creator_name: true,
+      },
+      with: {
+        members: {
+          columns: {
+            user_name: true,
+          },
+          orderBy: group_member.user_name,
+        },
+      },
+    });
+  },
 
-    for (const row of rows) {
-      const taskId = row.taskId?.toString(); // Ensure taskId is string
+  getTotalMembers: async (groupId: string) => {
+    const members = await db.query.group_member.findMany({
+      where: eq(group_member.group_id, groupId),
+      columns: { id: true },
+    });
 
-      if (!taskId) continue; // Skip if taskId is missing
+    return members.length;
+  },
 
-      if (!tasksMap[taskId]) {
-        tasksMap[taskId] = {
-          id: taskId,
-          name: row.taskName || "",
-          description: row.taskDescription ?? "", // Use `??` to avoid `null`
-          created_by: row.taskCreatedBy || "",
-          due_date: row.taskDueDate ?? null, // Use `null` for missing due dates
-          completed: Boolean(row.taskCompleted), // Convert to `boolean`
-          subtasks: [],
-        };
-      }
+  getTasksWithCompletion: async (
+    groupId: string,
+    page: number,
+    limit: number
+  ) => {
+    const offset = (page - 1) * limit;
 
-      if (row.subtaskId) {
-        tasksMap[taskId].subtasks.push({
-          id: row.subtaskId?.toString() ?? "",
-          name: row.subtaskName ?? "",
-          completed: Boolean(row.subtaskCompleted),
-          task_id: row.taskId ?? "",
-        });
-      }
-    }
+    return await db.query.task.findMany({
+      where: eq(task.group_id, groupId),
+      with: {
+        subtasks: {
+          columns: {
+            id: true,
+            title: true,
+          },
+          with: {
+            completions: {
+              columns: { completed_at: true, user_id: true },
+            },
+          },
+        },
+        completions: {
+          columns: { completed_at: true, user_id: true },
+        },
+      },
+      columns: {
+        id: true,
+        title: true,
+        due_date: true,
+        priority: true,
+      },
+      orderBy: (tasks, { desc }) => desc(tasks.created_at),
+      limit,
+      offset,
+    });
+  },
 
-    return Object.values(tasksMap);
+  getGroupTasks: async (
+    groupId: string,
+    page: number = 1,
+    limit: number = 10
+  ) => {
+    const { id: userId } = await getAuthenticatedUser();
+
+    const [tasks, totalMembers] = await Promise.all([
+      QUERIES.getTasksWithCompletion(groupId, page, limit),
+      QUERIES.getTotalMembers(groupId),
+    ]);
+
+    return tasks.map((task) => ({
+      ...task,
+      isCompleted: task.completions.some((comp) => comp.user_id === userId),
+      completedCount: `${task.completions.length} / ${totalMembers}`,
+      subtasks: task.subtasks.map((subtask) => ({
+        ...subtask,
+        isCompleted: subtask.completions.some(
+          (comp) => comp.user_id === userId
+        ),
+      })),
+    }));
   },
 };
 
 export const MUTATIONS = {
-  /**
-   * Creates a new group.
-   */
-  createGroup: async (groupName: string) => {
-    const user = await currentUser();
-
-    if (!user) {
-      throw Error("Unauthenticated user");
-    }
-
-    return db.insert(group_table).values([
-      {
-        created_by: user.fullName || "",
-        name: groupName,
-      },
-    ]);
+  createGroup: async (group_name: string, creator_name: string) => {
+    const { id: userId } = await getAuthenticatedUser();
+    const [code] = await db
+      .insert(group)
+      .values({
+        creator_id: userId,
+        group_name: group_name,
+        creator_name: creator_name,
+      })
+      .returning({ code: group.join_code });
+    return code;
   },
 
-  /**
-   * Joins a group using a join code.
-   */
-  joinGroupByCode: async (joinCode: string) => {
-    const user = await getAuthenticatedUser();
+  joinGroup: async (join_code: string, member_name: string) => {
+    const { id: userId } = await getAuthenticatedUser();
 
-    // 🔹 Validate if the group exists with the given join code
-    const group = await db
-      .select({ id: group_table.id })
-      .from(group_table)
-      .where(eq(group_table.join_code, joinCode))
-      .limit(1)
-      .then((rows) => rows[0]);
+    // first check if the group exists with the join_code
+    const [group_id] = await db
+      .select({ id: group.id })
+      .from(group)
+      .where(eq(group.join_code, join_code));
 
-    if (!group) {
-      throw new Error("Invalid or expired join code.");
-    }
-
-    // 🔹 Check if the user is already a member
-    const existingMembership = await db
-      .select()
-      .from(group_member_table)
-      .where(
-        and(
-          eq(group_member_table.user_id, user?.fullName || ""),
-          eq(group_member_table.group_id, group.id)
-        )
-      )
-      .limit(1);
-
-    if (existingMembership.length > 0) {
-      throw new Error("You are already a member of this group.");
-    }
-
-    // 🔹 Add user to the group
-    return db
-      .insert(group_member_table)
-      .values([{ user_id: user?.fullName || "", group_id: group.id }]);
+    // Join the group if i am not the member of it
+    return await db
+      .insert(group_member)
+      .values({
+        group_id: group_id.id,
+        user_id: userId,
+        user_name: member_name,
+      })
+      .returning({ code: group.join_code });
   },
 
-  /**
-   * Creates a task with optional subtasks.
-   */
   createTask: async (
-    groupId: number,
-    taskName: string,
-    subtasks: string[] = []
+    group_id: string,
+    title: string,
+    subtasks: string[],
+    due_date: Date | null
   ) => {
-    const user = await getAuthenticatedUser();
+    const { id: userId } = await getAuthenticatedUser();
 
-    if (!(await isUserInGroup(groupId, user?.fullName || ""))) {
-      throw new Error("You are not a member of this group.");
+    const [newTask] = await db
+      .insert(task)
+      .values({
+        creator_id: userId,
+        title: title,
+        group_id: group_id,
+        due_date: due_date ?? null,
+      })
+      .returning({ taskId: task.id });
+
+    if (!newTask?.taskId) {
+      throw new Error("Failed to create task.");
     }
 
-    return db.transaction(async (tx) => {
-      const task = await tx
-        .insert(task_table)
-        .values([
-          {
-            created_by: user?.fullName || "",
-            group_id: groupId,
-            name: taskName,
-          },
-        ])
-        .$returningId()
-        .then((rows) => rows[0]);
-
-      if (subtasks.length > 0) {
-        await tx
-          .insert(subtask_table)
-          .values(subtasks.map((name) => ({ task_id: task.id, name })));
-      }
-
-      return task;
-    });
-  },
-
-  /**
-   * Marks a task as completed.
-   */
-  markTaskComplete: async (taskId: number) => {
-    const user = await getAuthenticatedUser();
-    return db
-      .insert(task_completion_table)
-      .values([{ task_id: taskId, completed_by: user?.fullName || "" }]);
-  },
-
-  /**
-   * Marks a subtask as completed.
-   */
-  markSubtaskComplete: async (subtaskId: number) => {
-    const user = await getAuthenticatedUser();
-    return db
-      .insert(subtask_completion_table)
-      .values([{ subtask_id: subtaskId, completed_by: user?.fullName || "" }]);
-  },
-
-  /**
-   * Unmarks a task as completed.
-   */
-  unmarkTaskComplete: async (taskId: number) => {
-    const user = await getAuthenticatedUser();
-
-    // Delete the task completion record to unmark it as completed
-    return db
-      .delete(task_completion_table)
-      .where(
-        and(
-          eq(task_completion_table.task_id, taskId),
-          eq(task_completion_table.completed_by, user?.fullName || "")
-        )
+    if (subtasks.length > 0) {
+      await db.insert(subtask).values(
+        subtasks.map((name) => ({
+          task_id: newTask.taskId,
+          title: name.trim(),
+        }))
       );
-  },
+    }
 
-  /**
-   * Unmarks a subtask as completed.
-   */
-  unmarkSubtaskComplete: async (subtaskId: number) => {
-    const user = await getAuthenticatedUser();
-
-    // Delete the subtask completion record to unmark it as completed
-    return db
-      .delete(subtask_completion_table)
-      .where(
-        and(
-          eq(subtask_completion_table.subtask_id, subtaskId),
-          eq(subtask_completion_table.completed_by, user?.fullName || "")
-        )
-      );
+    return { taskId: newTask.taskId };
   },
 };
