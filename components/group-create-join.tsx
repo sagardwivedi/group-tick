@@ -9,7 +9,7 @@ import {
   Share2,
   Sparkles,
   UserPlus,
-  Users
+  Users,
 } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -22,7 +22,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,7 +90,6 @@ export function GroupManager() {
       icon: <Copy className="h-4 w-4" />,
     });
 
-    // Reset copied status after 2 seconds
     setTimeout(() => setCopied(false), 2000);
   };
 

@@ -51,6 +51,7 @@ export const QUERIES = {
         members: {
           columns: {
             user_name: true,
+            avatar_url: true,
           },
           orderBy: group_member.user_name,
         },
@@ -146,7 +147,7 @@ export const MUTATIONS = {
   },
 
   joinGroup: async (join_code: string, member_name: string) => {
-    const { id: userId } = await getAuthenticatedUser();
+    const { id: userId, imageUrl } = await getAuthenticatedUser();
 
     // first check if the group exists with the join_code
     const [group_id] = await db
@@ -155,14 +156,12 @@ export const MUTATIONS = {
       .where(eq(group.join_code, join_code));
 
     // Join the group if i am not the member of it
-    return await db
-      .insert(group_member)
-      .values({
-        group_id: group_id.id,
-        user_id: userId,
-        user_name: member_name,
-      })
-      .returning({ code: group.join_code });
+    return await db.insert(group_member).values({
+      group_id: group_id.id,
+      user_id: userId,
+      user_name: member_name,
+      avatar_url: imageUrl,
+    });
   },
 
   createTask: async (

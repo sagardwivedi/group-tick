@@ -20,9 +20,9 @@ import {
 import type { QUERIES } from "@/db/queries";
 
 import { toast } from "sonner";
-import { TaskItem } from "./task";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { AddTaskDialog } from "./AddTask";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { TaskItem } from "./task";
 
 type GroupType = Awaited<ReturnType<typeof QUERIES.getGroupInfo>>;
 export type TaskType = Awaited<ReturnType<typeof QUERIES.getGroupTasks>>;
@@ -35,7 +35,7 @@ interface GroupTasksProps {
 export function GroupTasks({ tasks, group }: GroupTasksProps) {
   const router = useRouter();
   return (
-    <div className="container mx-auto p-4 md:p-6 space-y-4 md:space-y-6">
+    <div className="container mx-auto space-y-4">
       <header className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div className="flex items-center justify-between md:justify-start gap-4">
           <Button
@@ -158,6 +158,7 @@ function GroupInfo({ group }: GroupInfoProps) {
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition"
                   >
                     <Avatar>
+                      <AvatarImage src={member.avatar_url ?? ""} />
                       <AvatarFallback>
                         {member.user_name.charAt(0)}
                       </AvatarFallback>

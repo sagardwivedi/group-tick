@@ -200,7 +200,7 @@ export function AddTaskDialog({ groupId }: AddTaskDialogProps) {
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem className="space-y-2">
+                  <FormItem>
                     <FormLabel className="text-sm font-medium">
                       Due Date
                     </FormLabel>
@@ -333,7 +333,7 @@ export function AddTaskDialog({ groupId }: AddTaskDialogProps) {
                               {...field}
                               placeholder={`Subtask ${index + 1}`}
                               aria-label={`Subtask ${index + 1}`}
-                              className="text-sm focus-visible:ring-primary"
+                              className="text-sm"
                             />
                             <Button
                               type="button"
