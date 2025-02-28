@@ -97,6 +97,7 @@ export const QUERIES = {
         title: true,
         due_date: true,
         priority: true,
+        description: true,
       },
       orderBy: (tasks, { desc }) => desc(tasks.created_at),
       limit,
@@ -167,6 +168,8 @@ export const MUTATIONS = {
   createTask: async (
     group_id: string,
     title: string,
+    description: string,
+    priority: "low" | "medium" | "high" | "urgent" | "none",
     subtasks: string[],
     due_date: Date | null
   ) => {
@@ -177,7 +180,9 @@ export const MUTATIONS = {
       .values({
         creator_id: userId,
         title: title,
+        description: description,
         group_id: group_id,
+        priority: priority,
         due_date: due_date ?? null,
       })
       .returning({ taskId: task.id });
@@ -187,12 +192,12 @@ export const MUTATIONS = {
     }
 
     if (subtasks.length > 0) {
-      await db.insert(subtask).values(
-        subtasks.map((name) => ({
-          task_id: newTask.taskId,
-          title: name.trim(),
-        }))
-      );
+      const subtasksToInsert = subtasks.map((name) => ({
+        task_id: newTask.taskId,
+        title: name.trim(),
+      }));
+
+      await db.insert(subtask).values(subtasksToInsert);
     }
 
     return { taskId: newTask.taskId };

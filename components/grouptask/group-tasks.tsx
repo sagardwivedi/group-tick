@@ -1,20 +1,13 @@
 "use client";
 
-import { ArrowLeft, Copy, Info, Loader, Plus, Trash } from "lucide-react";
+import { ArrowLeft, Copy, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Fragment, useActionState, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -25,21 +18,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { QUERIES } from "@/db/queries";
-import {
-  createTask
-} from "@/lib/actions/action";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
 
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { toast } from "sonner";
-import { TaskItem } from "./groupId/task";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { TaskItem } from "./task";
+import { AddTaskDialog } from "./AddTask";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 
 type GroupType = Awaited<ReturnType<typeof QUERIES.getGroupInfo>>;
 export type TaskType = Awaited<ReturnType<typeof QUERIES.getGroupTasks>>;
@@ -192,137 +175,5 @@ function GroupInfo({ group }: GroupInfoProps) {
         </div>
       </SheetContent>
     </Sheet>
-  );
-}
-
-interface AddTaskDialogProps {
-  groupId?: string;
-}
-
-export function AddTaskDialog({ groupId }: AddTaskDialogProps) {
-  const [open, setOpen] = useState(false);
-  const [state, formAction, isPending] = useActionState(createTask, {});
-  const [subtasks, setSubtasks] = useState<{ name: string }[]>([]);
-  const [date, setDate] = useState<Date>();
-
-  useEffect(() => {
-    if (state?.success) {
-      setOpen(false);
-    }
-  }, [state]);
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="w-full md:w-auto">
-          <Plus className="mr-2 size-4" />
-          Add Task
-        </Button>
-      </DialogTrigger>
-
-      <DialogContent className="w-[95%] sm:max-w-md  shadow-xl rounded-lg p-6">
-        <DialogHeader>
-          <DialogTitle className="text-lg md:text-xl font-semibold text-center">
-            Create New Task
-          </DialogTitle>
-        </DialogHeader>
-
-        <form action={formAction} className="space-y-4">
-          <input type="hidden" name="group_id" value={groupId} />
-
-          {/* Task Name */}
-          <Input
-            name="task"
-            placeholder="Task name"
-            required
-            aria-label="Task name"
-            className="text-sm md:text-base"
-          />
-
-          {/* Due Date Picker */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium mb-1">Due Date</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`w-[280px] justify-start text-left font-normal ${
-                    !date ? "text-muted-foreground" : ""
-                  }`}
-                  aria-label="Select due date"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(selectedDate) => setDate(selectedDate)}
-                  initialFocus
-                  aria-label="Date picker"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          {/* Subtasks Section */}
-          <div className="space-y-2">
-            <h3 className="text-sm md:text-base font-medium">Subtasks</h3>
-            {subtasks.map((_, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Input
-                  name={`subtasks[${index}]`}
-                  placeholder={`Subtask ${index + 1}`}
-                  aria-label={`Subtask ${index + 1}`}
-                  className="text-sm md:text-base"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() =>
-                    setSubtasks((prev) => prev.filter((_, i) => i !== index))
-                  }
-                  className="h-8 w-8"
-                >
-                  <Trash className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setSubtasks((prev) => [...prev, { name: "" }])}
-              className="w-full text-sm md:text-base"
-            >
-              <Plus className="mr-2 h-4 w-4" /> Add Subtask
-            </Button>
-          </div>
-
-          <SubmitButton pending={isPending} />
-        </form>
-
-        {state?.error && (
-          <p className="text-sm text-destructive text-center mt-4">
-            {state.error}
-          </p>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function SubmitButton({ pending }: { pending: boolean }) {
-  return (
-    <Button
-      type="submit"
-      disabled={pending}
-      className="w-full text-sm md:text-base"
-    >
-      {pending ? <Loader className="h-4 w-4 animate-spin" /> : "Create Task"}
-    </Button>
   );
 }

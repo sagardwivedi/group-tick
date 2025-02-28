@@ -9,8 +9,7 @@ import {
   Share2,
   Sparkles,
   UserPlus,
-  Users,
-  XIcon,
+  Users
 } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -21,10 +20,9 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +33,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { DialogClose } from "@radix-ui/react-dialog";
 
 export function GroupManager() {
   const [joinResponse, joinAction, isJoining] = useActionState(
@@ -84,7 +81,6 @@ export function GroupManager() {
       setCopied(false);
     }
   }, [isOpen]);
-
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);

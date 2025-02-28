@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
 import {
-  boolean,
   index,
   pgEnum,
   pgTable,
@@ -64,10 +63,10 @@ export const task = pgTable(
       .notNull()
       .references(() => group.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
+    description: text("description"),
     due_date: timestamp("due_date"),
     created_at: timestamp("created_at").defaultNow().notNull(),
     priority: taskPriorityEnum("priority").default("none"),
-    archived: boolean("archived").default(false),
   },
   (t) => [index("idx_task_group").on(t.group_id)]
 );
@@ -151,16 +150,22 @@ export const groupMemberRelations = relations(group_member, ({ one }) => ({
   }),
 }));
 
-export const subtaskCompletionRelations = relations(subtask_completion, ({ one }) => ({
-  subtask: one(subtask, {
-    fields: [subtask_completion.subtask_id],
-    references: [subtask.id],
-  }),
-}));
+export const subtaskCompletionRelations = relations(
+  subtask_completion,
+  ({ one }) => ({
+    subtask: one(subtask, {
+      fields: [subtask_completion.subtask_id],
+      references: [subtask.id],
+    }),
+  })
+);
 
-export const taskCompletionRelations = relations(task_completion, ({ one }) => ({
-  task: one(task, {
-    fields: [task_completion.task_id],
-    references: [task.id],
-  }),
-}));
+export const taskCompletionRelations = relations(
+  task_completion,
+  ({ one }) => ({
+    task: one(task, {
+      fields: [task_completion.task_id],
+      references: [task.id],
+    }),
+  })
+);

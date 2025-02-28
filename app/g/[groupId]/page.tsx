@@ -1,4 +1,4 @@
-import { GroupTasks } from "@/components/group-tasks";
+import { GroupTasks } from "@/components/grouptask/group-tasks";
 import { QUERIES } from "@/db/queries";
 
 export default async function Tasks({

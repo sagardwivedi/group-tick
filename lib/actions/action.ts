@@ -71,35 +71,40 @@ export async function createTask(
   _: FormError,
   queryData: FormData
 ): Promise<FormError> {
-  const task = queryData.get("task")?.toString()?.trim();
-  const groupIdStr = queryData.get("group_id")?.toString();
-  const dueDateStr = queryData.get("due_date")?.toString();
+  const task = queryData.get("task") as string | null;
+  const groupId = queryData.get("group_id") as string | null;
+  const description = (queryData.get("description") as string) ?? "";
+  const priority =
+    (queryData.get("priority") as
+      | "low"
+      | "medium"
+      | "high"
+      | "urgent"
+      | "none") ?? "medium";
+
+  const dateStr = queryData.get("date") as string | null;
+  const dueDate =
+    dateStr && !isNaN(Date.parse(dateStr)) ? new Date(dateStr) : null;
+
+  const subtasks = queryData.getAll("subtasks[]").map(String);
 
   if (!task) return { error: "Task is required." };
-  if (!groupIdStr) return { error: "Invalid or missing Group ID." };
-
-  let dueDate = null;
-  if (dueDateStr) {
-    dueDate = new Date(dueDateStr);
-    if (isNaN(dueDate.getTime())) {
-      return { error: "Invalid date format." }; // Handle invalid date format
-    }
-  }
-
-  const subtasks: string[] = [];
-  for (const [key, value] of queryData.entries()) {
-    if (key.startsWith("subtask_") && value.toString().trim() !== "") {
-      subtasks.push(value.toString().trim());
-    }
-  }
+  if (!groupId) return { error: "Invalid or missing Group ID." };
 
   try {
-    await MUTATIONS.createTask(groupIdStr, task, subtasks, dueDate);
-    revalidatePath("/g/[groupId]/page");
+    await MUTATIONS.createTask(
+      groupId,
+      task,
+      description,
+      priority,
+      subtasks,
+      dueDate
+    );
+    revalidatePath(`/g/${groupId}/page`);
     return { success: true };
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : `Creating task failed.`,
+      error: error instanceof Error ? error.message : "Failed to create task.",
     };
   }
 }

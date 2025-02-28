@@ -22,7 +22,7 @@ export function MobileGroupsDrawer() {
           <div className="p-4 h-full">
             <h2 className="text-xl font-bold mb-4">Your Groups</h2>
             <Suspense fallback={<GroupsSkeleton />}>
-              <GroupsList mobileView />
+              <GroupsList />
             </Suspense>
           </div>
         </DrawerContent>
