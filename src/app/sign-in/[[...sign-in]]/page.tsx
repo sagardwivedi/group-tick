@@ -9,7 +9,7 @@ export default async function Page() {
   if (user) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <SignIn fallbackRedirectUrl={`/dashbaord`} />
+        <SignIn />
       </div>
     );
   }
