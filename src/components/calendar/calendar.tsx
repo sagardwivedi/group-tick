@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { TaskDialog } from "./task-dialog";
+import { TaskDialog } from "../task-dialog";
 
 // Get the current year and month
 const currentYear = new Date().getFullYear();

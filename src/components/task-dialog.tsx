@@ -33,25 +33,8 @@ import { useState } from "react";
 interface TaskDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  task?: Task;
+  task?: any;
   mode?: "create" | "edit";
-}
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  date: Date;
-  priority: string;
-  status: string;
-  group: string;
-  assignee: Assignee;
-}
-
-interface Assignee {
-  name: string;
-  avatar: string;
-  initials: string;
 }
 
 export function TaskDialog({
