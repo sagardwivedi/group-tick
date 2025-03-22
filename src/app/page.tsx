@@ -9,6 +9,8 @@ import {
   Testimonials,
 } from "@/components/landing-page";
 
+export const experimental_ppr = true;
+
 export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col">

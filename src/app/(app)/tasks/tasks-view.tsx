@@ -50,7 +50,7 @@ import {
   X,
 } from "lucide-react";
 import * as React from "react";
-import { TaskDialog } from "./task-dialog";
+import { TaskDialog } from "../../../components/task-dialog";
 
 // Sample task data
 const tasks = [

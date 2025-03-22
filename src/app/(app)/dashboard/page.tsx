@@ -1,5 +1,5 @@
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardShell } from "@/components/dashboard-shell";
 import { GroupList } from "@/components/dashboard/group-list";
 import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { TaskList } from "@/components/dashboard/task-list";
@@ -17,7 +17,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarDays, CheckCircle, Clock, Plus, Users } from "lucide-react";
 
-import data from "@/app/dashboard/data.json";
+import data from "@/app/(app)/dashboard/data.json";
 
 export default function DashboardPage() {
   return (

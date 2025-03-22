@@ -1,6 +1,6 @@
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { GroupsView } from "@/components/groups-view";
+import { GroupsView } from "@/app/(app)/groups/groups-view";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardShell } from "@/components/dashboard-shell";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 

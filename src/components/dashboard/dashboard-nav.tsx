@@ -22,37 +22,37 @@ const navItems = [
   },
   {
     title: "My Tasks",
-    href: "/dashboard/tasks",
+    href: "/tasks",
     icon: CheckSquare,
   },
   {
     title: "My Groups",
-    href: "/dashboard/groups",
+    href: "/groups",
     icon: Users,
   },
   {
     title: "Calendar",
-    href: "/dashboard/calendar",
+    href: "/calendar",
     icon: Clock,
   },
   {
     title: "Projects",
-    href: "/dashboard/projects",
+    href: "/projects",
     icon: LayoutGrid,
   },
   {
     title: "Messages",
-    href: "/dashboard/messages",
+    href: "/messages",
     icon: MessageSquare,
   },
   {
     title: "Analytics",
-    href: "/dashboard/analytics",
+    href: "/analytics",
     icon: BarChart,
   },
   {
     title: "Settings",
-    href: "/dashboard/settings",
+    href: "/settings",
     icon: Settings,
   },
 ];

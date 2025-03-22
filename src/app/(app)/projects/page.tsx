@@ -1,8 +1,8 @@
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { ProjectsView } from "@/components/projects-view";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardShell } from "@/components/dashboard-shell";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { ProjectsView } from "./projects-view";
 
 export default function ProjectsPage() {
   return (

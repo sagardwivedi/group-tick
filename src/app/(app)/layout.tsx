@@ -1,8 +1,8 @@
-import type React from "react";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { UserNav } from "@/components/dashboard/user-nav";
 import { ModeToggle } from "@/components/mode-toggle";
 import { CheckCircle } from "lucide-react";
+import type React from "react";
 
 export default function DashboardLayout({
   children,
@@ -25,7 +25,7 @@ export default function DashboardLayout({
         <aside className="hidden w-64 shrink-0 border-r md:block">
           <DashboardNav />
         </aside>
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-5">{children}</main>
       </div>
     </div>
   );
