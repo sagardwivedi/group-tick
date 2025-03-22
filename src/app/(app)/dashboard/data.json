@@ -1,0 +1,226 @@
+{
+    "groups": [
+        {
+            "id": "group-1",
+            "name": "Marketing Team",
+            "description": "Responsible for all marketing activities and campaigns",
+            "members": [
+                {
+                    "name": "Alex Johnson",
+                    "avatar": "/placeholder.svg?height=32&width=32",
+                    "initials": "AJ"
+                },
+                {
+                    "name": "Sarah Miller",
+                    "avatar": "/placeholder.svg?height=32&width=32",
+                    "initials": "SM"
+                },
+                {
+                    "name": "David Lee",
+                    "avatar": "/placeholder.svg?height=32&width=32",
+                    "initials": "DL"
+                }
+            ],
+            "taskCount": 12,
+            "completedTasks": 8,
+            "activeProjects": 2
+        },
+        {
+            "id": "group-2",
+            "name": "Development Team",
+            "description": "Frontend and backend development for all products",
+            "members": [
+                {
+                    "name": "Michael Chen",
+                    "avatar": "/placeholder.svg?height=32&width=32",
+                    "initials": "MC"
+                },
+                {
+                    "name": "Emma Wilson",
+                    "avatar": "/placeholder.svg?height=32&width=32",
+                    "initials": "EW"
+                },
+                {
+                    "name": "James Rodriguez",
+                    "avatar": "/placeholder.svg?height=32&width=32",
+                    "initials": "JR"
+                },
+                {
+                    "name": "Lisa Wang",
+                    "avatar": "/placeholder.svg?height=32&width=32",
+                    "initials": "LW"
+                }
+            ],
+            "taskCount": 24,
+            "completedTasks": 15,
+            "activeProjects": 3
+        },
+        {
+            "id": "group-3",
+            "name": "Design Team",
+            "description": "UI/UX design for web and mobile applications",
+            "members": [
+                {
+                    "name": "Emma Wilson",
+                    "avatar": "/placeholder.svg?height=32&width=32",
+                    "initials": "EW"
+                },
+                {
+                    "name": "Alex Johnson",
+                    "avatar": "/placeholder.svg?height=32&width=32",
+                    "initials": "AJ"
+                }
+            ],
+            "taskCount": 8,
+            "completedTasks": 5,
+            "activeProjects": 1
+        }
+    ],
+    "activities": [
+        {
+            "id": "activity-1",
+            "user": {
+                "name": "Alex Johnson",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "AJ"
+            },
+            "action": "completed",
+            "task": "Update website content",
+            "group": "Marketing Team",
+            "time": "2 hours ago"
+        },
+        {
+            "id": "activity-2",
+            "user": {
+                "name": "Sarah Miller",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "SM"
+            },
+            "action": "created",
+            "task": "Q3 Marketing Strategy",
+            "group": "Marketing Team",
+            "time": "3 hours ago"
+        },
+        {
+            "id": "activity-3",
+            "user": {
+                "name": "Michael Chen",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "MC"
+            },
+            "action": "commented on",
+            "task": "Fix navigation bug",
+            "group": "Development Team",
+            "time": "5 hours ago",
+            "comment": "I've identified the issue. It's related to the event propagation in the mobile menu component."
+        },
+        {
+            "id": "activity-4",
+            "user": {
+                "name": "Emma Wilson",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "EW"
+            },
+            "action": "assigned",
+            "task": "Design new logo options",
+            "group": "Design Team",
+            "assignee": "Alex Johnson",
+            "time": "Yesterday"
+        },
+        {
+            "id": "activity-5",
+            "user": {
+                "name": "James Rodriguez",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "JR"
+            },
+            "action": "created group",
+            "group": "Product Team",
+            "time": "Yesterday"
+        },
+        {
+            "id": "activity-6",
+            "user": {
+                "name": "Lisa Wang",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "LW"
+            },
+            "action": "updated",
+            "task": "API Documentation",
+            "group": "Development Team",
+            "time": "2 days ago"
+        }
+    ],
+    "tasks": [
+        {
+            "id": "task-1",
+            "title": "Update website content",
+            "description": "Update the landing page with new testimonials and features",
+            "dueDate": "2023-06-15",
+            "priority": "High",
+            "status": "In Progress",
+            "group": "Marketing Team",
+            "assignee": {
+                "name": "Alex Johnson",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "AJ"
+            }
+        },
+        {
+            "id": "task-2",
+            "title": "Prepare quarterly report",
+            "description": "Compile data and create presentation for quarterly meeting",
+            "dueDate": "2023-06-20",
+            "priority": "Medium",
+            "status": "Not Started",
+            "group": "Executive Team",
+            "assignee": {
+                "name": "Sarah Miller",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "SM"
+            }
+        },
+        {
+            "id": "task-3",
+            "title": "Fix navigation bug",
+            "description": "Address the issue with mobile navigation menu not closing properly",
+            "dueDate": "2023-06-10",
+            "priority": "High",
+            "status": "In Progress",
+            "group": "Development Team",
+            "assignee": {
+                "name": "Michael Chen",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "MC"
+            }
+        },
+        {
+            "id": "task-4",
+            "title": "Design new logo options",
+            "description": "Create 3-5 logo variations based on client feedback",
+            "dueDate": "2023-06-18",
+            "priority": "Medium",
+            "status": "In Progress",
+            "group": "Design Team",
+            "assignee": {
+                "name": "Emma Wilson",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "EW"
+            }
+        },
+        {
+            "id": "task-5",
+            "title": "Update user documentation",
+            "description": "Revise user guide to include new features from latest release",
+            "dueDate": "2023-06-25",
+            "priority": "Low",
+            "status": "Not Started",
+            "group": "Documentation Team",
+            "assignee": {
+                "name": "Alex Johnson",
+                "avatar": "/placeholder.svg?height=32&width=32",
+                "initials": "AJ"
+            }
+        }
+    ]
+}

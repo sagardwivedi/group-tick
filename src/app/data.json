@@ -1,0 +1,159 @@
+{
+    "header": {
+        "logo": {
+            "icon": "CheckCircle",
+            "text": "TaskCollab"
+        },
+        "navLinks": [
+            {
+                "href": "#features",
+                "text": "Features"
+            },
+            {
+                "href": "#how-it-works",
+                "text": "How It Works"
+            },
+            {
+                "href": "#testimonials",
+                "text": "Testimonials"
+            }
+        ],
+        "authLinks": [
+            {
+                "href": "/sign-in",
+                "text": "Log in"
+            },
+            {
+                "href": "/sign-up",
+                "text": "Get Started"
+            }
+        ]
+    },
+    "hero": {
+        "title": "Streamline Collaboration, Simplify Task Management",
+        "description": "Bring your team together with a powerful platform that makes group collaboration and task management effortless.",
+        "buttons": [
+            {
+                "href": "/sign-up",
+                "text": "Get Started for Free"
+            },
+            {
+                "href": "#how-it-works",
+                "text": "How It Works",
+                "icon": "ArrowRight"
+            }
+        ],
+        "image": {
+            "src": "/placeholder.svg?height=550&width=550",
+            "alt": "TaskCollab Dashboard Preview"
+        }
+    },
+    "features": {
+        "title": "Key Features",
+        "description": "Everything you need to keep your team organized, accountable, and productive.",
+        "items": [
+            {
+                "icon": "Users",
+                "title": "Group Creation",
+                "description": "Create or join groups based on projects, interests, or teams."
+            },
+            {
+                "icon": "CheckSquare",
+                "title": "Task Management",
+                "description": "Create, assign, and track tasks with due dates and priorities."
+            },
+            {
+                "icon": "Calendar",
+                "title": "Due Dates",
+                "description": "Set deadlines and receive reminders to stay on track."
+            },
+            {
+                "icon": "CheckCircle",
+                "title": "Accountability",
+                "description": "Track progress and ensure everyone completes their tasks."
+            }
+        ]
+    },
+    "howItWorks": {
+        "title": "How It Works",
+        "description": "Get started in minutes and transform how your team collaborates.",
+        "steps": [
+            {
+                "number": 1,
+                "title": "Sign Up",
+                "description": "Create your account with a simple and secure sign-up process."
+            },
+            {
+                "number": 2,
+                "title": "Create or Join Groups",
+                "description": "Start a new group or join existing ones with a simple invitation."
+            },
+            {
+                "number": 3,
+                "title": "Manage Tasks",
+                "description": "Create tasks, assign responsibilities, and track progress together."
+            }
+        ]
+    },
+    "testimonials": {
+        "title": "What Our Users Say",
+        "description": "Discover how TaskCollab has transformed team collaboration for our users.",
+        "items": [
+            {
+                "text": "TaskCollab has completely transformed how our marketing team collaborates. We're more organized and accountable than ever.",
+                "author": {
+                    "name": "Sarah Johnson",
+                    "role": "Marketing Director",
+                    "avatar": "/placeholder.svg?height=40&width=40"
+                }
+            },
+            {
+                "text": "The accountability features have been a game-changer for our remote team. Everyone knows what they need to do and when.",
+                "author": {
+                    "name": "Michael Chen",
+                    "role": "Product Manager",
+                    "avatar": "/placeholder.svg?height=40&width=40"
+                }
+            },
+            {
+                "text": "Setting up our project groups took minutes, and now we have complete visibility into all our ongoing tasks.",
+                "author": {
+                    "name": "Alex Rodriguez",
+                    "role": "Team Lead",
+                    "avatar": "/placeholder.svg?height=40&width=40"
+                }
+            }
+        ]
+    },
+    "cta": {
+        "title": "Ready to transform your team's collaboration?",
+        "description": "Join thousands of teams already using TaskCollab to streamline their workflow and boost productivity.",
+        "buttons": [
+            {
+                "text": "Get Started for Free",
+                "href": "/sign-up",
+                "variant": "secondary"
+            }
+        ]
+    },
+    "footer": {
+        "logo": {
+            "icon": "CheckCircle",
+            "text": "TaskCollab"
+        },
+        "links": [
+            {
+                "href": "/terms",
+                "text": "Terms"
+            },
+            {
+                "href": "/privacy",
+                "text": "Privacy"
+            },
+            {
+                "href": "/contact",
+                "text": "Contact"
+            }
+        ]
+    }
+}
