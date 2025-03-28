@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy":"convex deploy --cmd 'bun run build'"
   },
   "dependencies": {
     "@clerk/elements": "^0.23.8",
