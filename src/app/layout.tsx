@@ -2,9 +2,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from '@clerk/themes'
-
+import { ConvexClientProvider } from "@/components/convex-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,11 +36,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ClerkProvider appearance={{
-            baseTheme: dark
-          }}>
-            {children}
-          </ClerkProvider>
+          <ConvexClientProvider>{children}</ConvexClientProvider>
         </ThemeProvider>
       </body>
     </html>

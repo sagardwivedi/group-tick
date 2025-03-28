@@ -1,5 +1,6 @@
 "use client";
 
+import { TaskDialog } from "@/components/task-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,8 +50,7 @@ import {
   Tag,
   X,
 } from "lucide-react";
-import * as React from "react";
-import { TaskDialog } from "../../../components/task-dialog";
+import { useMemo, useState } from "react";
 
 // Sample task data
 const tasks = [
@@ -209,28 +209,20 @@ const tasks = [
   },
 ];
 
-// Group tasks by status for board view
-const tasksByStatus = {
-  "Not Started": tasks.filter((task) => task.status === "Not Started"),
-  "In Progress": tasks.filter((task) => task.status === "In Progress"),
-  Completed: tasks.filter((task) => task.status === "Completed"),
-};
-
 export function TasksView() {
-  const [viewMode, setViewMode] = React.useState<"list" | "board">("list");
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [selectedTask, setSelectedTask] = React.useState<
-    (typeof tasks)[0] | null
-  >(null);
-  const [isTaskDialogOpen, setIsTaskDialogOpen] = React.useState(false);
-  const [activeFilters, setActiveFilters] = React.useState<string[]>([]);
-  const [sortBy, setSortBy] = React.useState<string>("dueDate");
-  const [statusFilter, setStatusFilter] = React.useState<string>("all");
-  const [priorityFilter, setPriorityFilter] = React.useState<string>("all");
-  const [groupFilter, setGroupFilter] = React.useState<string>("all");
+  const [viewMode, setViewMode] = useState<"list" | "board">("list");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTask, setSelectedTask] = useState<(typeof tasks)[0] | null>(
+    null
+  );
+  const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("dueDate");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [groupFilter, setGroupFilter] = useState<string>("all");
 
   // Filter tasks based on search query and active filters
-  const filteredTasks = React.useMemo(() => {
+  const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
       // Search filter
       const matchesSearch =
@@ -258,7 +250,7 @@ export function TasksView() {
   }, [searchQuery, statusFilter, priorityFilter, groupFilter]);
 
   // Sort filtered tasks
-  const sortedTasks = React.useMemo(() => {
+  const sortedTasks = useMemo(() => {
     return [...filteredTasks].sort((a, b) => {
       switch (sortBy) {
         case "dueDate":
@@ -278,7 +270,7 @@ export function TasksView() {
   }, [filteredTasks, sortBy]);
 
   // Group tasks by status for board view (after filtering)
-  const filteredTasksByStatus = React.useMemo(() => {
+  const filteredTasksByStatus = useMemo(() => {
     return {
       "Not Started": filteredTasks.filter(
         (task) => task.status === "Not Started"
@@ -295,18 +287,7 @@ export function TasksView() {
     setIsTaskDialogOpen(true);
   };
 
-  const addFilter = (filter: string) => {
-    if (!activeFilters.includes(filter)) {
-      setActiveFilters([...activeFilters, filter]);
-    }
-  };
-
-  const removeFilter = (filter: string) => {
-    setActiveFilters(activeFilters.filter((f) => f !== filter));
-  };
-
   const clearFilters = () => {
-    setActiveFilters([]);
     setSearchQuery("");
     setStatusFilter("all");
     setPriorityFilter("all");
